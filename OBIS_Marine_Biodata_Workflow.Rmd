@@ -9,14 +9,17 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ## R Markdown
+Notebook developed with R version 4.2.2
 
 # Use Case: Interoperable IFCB data product for the CA HAB Bulletin
 # aka IFCB Dashboard to OBIS use case with automated classification
 ## Event core with Occurrence extension
 Ian Brunjes (SCCOOS), Stace Beaulieu (WHOI)
 Prepared for OBIS IOOS Marine Biological Data Mobilization Workshop April 2023
+
 **This is a prototype for testing purposes only.**
 **A protocol is being developed to determine if and when appropriate to submit products from automated classification to OBIS.**
+
 Sponsored by NOAA PCMHAB20 project “Harmful Algal Bloom Community Technology Accelerator”
 
 Main steps in the workflow can be related to the [IFCB workflow diagram](https://raw.githubusercontent.com/hsosik/ifcb-analysis/master/Development/IFCB%20workflow%20chart.png) in the [ifcb-analysis wiki on GitHub](https://github.com/hsosik/ifcb-analysis/wiki)
