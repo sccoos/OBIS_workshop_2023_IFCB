@@ -59,7 +59,7 @@ bin_has_autoclass = function(bin) {
 #' @returns A data frame.
 #' @examples
 #' read_autoclass_csv("D20230326T150748_IFCB158", c("pid", "Alexandrium catenella")
-read_autoclass_csv = function(bin, target_species = c()) {
+read_autoclass_csv = function(bin, target_labels = c()) {
   url = "https://ifcb.caloos.org/del-mar-mooring/"
   file_name = paste0(bin, "_class_scores.csv")
   bin_url = paste0(url, file_name)
@@ -69,12 +69,12 @@ read_autoclass_csv = function(bin, target_species = c()) {
       autoclass = read_csv(bin_url)
       
       # Filter to variables of interest
-      if (!is_empty(target_species)) {
-        autoclass = autoclass %>% select(all_of(c("pid", target_species)))
+      if (!is_empty(target_labels)) {
+        autoclass = autoclass %>% select(all_of(c("pid", target_labels)))
         return(autoclass)
       }
        else {
-         message("target_species list must be provided")
+         message("target_labels list must be provided")
          return(NA)
        }
     },

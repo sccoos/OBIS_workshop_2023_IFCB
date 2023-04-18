@@ -53,8 +53,3 @@ get_bin_occurrence_summary = function(bin_id, target_labels = c()) {
   
   return(bin_reclass_summary)
 }
-
-
-
-
-# output "counts per mL"
