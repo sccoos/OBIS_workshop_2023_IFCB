@@ -92,12 +92,12 @@ We also add columns to meet the EU Horizon 2020 “Best practices and recommenda
 # datasetName 	eventID 	eventDate 	decimalLongitude 	decimalLatitude 	countryCode 	geodeticDatum 	minimumDepthInMeters 	maximumDepthInMeters
 
 # intended column headers for occurrence table
-# eventID 	occurrenceID 	basisOfRecord 	identifiedBy identificationVerificationStatus 	identificationReferences 	associatedMedia 	verbatimIdentification 	scientificName 	scientificNameID 	taxonRank kingdom 	occurrenceStatus 	institutionCode
+# eventID 	occurrenceID 	basisOfRecord 	identifiedBy identificationVerificationStatus 	identificationReferences 	associatedMedia 	verbatimIdentification 	scientificName 	scientificNameID 	taxonRank kingdom 	occurrenceStatus 	organismQuantity organismQuantityType institutionCode
 # fill values per column
 # basisOfRecord MachineObservation
 # identifiedBy do not fill (leave blank for non-validated imaging dataset)
 # identificationVerificationStatus PredictedByMachine
 # identificationReferences (here is where we will recommend DOI for trained model)
-
+# organismQuantityType counts per milliliter
 
 ```
