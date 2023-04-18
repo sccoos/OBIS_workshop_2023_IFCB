@@ -61,6 +61,7 @@ get_bin_occurrence_summary = function(bin_id, target_labels = c()) {
       sampleTime = bin_details$timestamp_iso,
       lat = bin_details$lat,
       lng = bin_details$lng,
+      binId = bin_id
     )
   
   
