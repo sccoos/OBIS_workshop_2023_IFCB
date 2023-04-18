@@ -51,5 +51,18 @@ get_bin_occurrence_summary = function(bin_id, target_labels = c()) {
     summarize(occurrences = n()) %>% 
     mutate(occurrences_per_ml = occurrences/bin_ml_analyzed)
   
+  
+  ## TODO
+  # worms lookup: scientificName 	scientificNameID 	taxonRank kingdom
+  # add event metadata
+  
+  bin_reclass_summary = bin_reclass_summary %>%
+    mutate(
+      sampleTime = bin_details$timestamp_iso,
+      lat = bin_details$lat,
+      lng = bin_details$lng,
+    )
+  
+  
   return(bin_reclass_summary)
 }
