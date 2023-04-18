@@ -1,0 +1,4 @@
+label,intended_worms_taxon,autoclass_threshold
+Alexandrium catenella,Alexandrium catenella,0.04
+Pseudo-nitzschia,Pseudo-nitzschia,0.4
+pennate Pseudo-nitzschia,Pseudo-nitzschia,0.4
