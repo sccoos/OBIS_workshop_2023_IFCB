@@ -9,6 +9,27 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Use Case: Interoperable IFCB data product for the CA HAB Bulletin
+# aka IFCB Dashboard to OBIS use case with automated classification
+## Event core with Occurrence extension
+Ian Brunjes (SCCOOS), Stace Beaulieu (WHOI)
+Prepared for OBIS IOOS Marine Biological Data Mobilization Workshop April 2023
+**This is a prototype for testing purposes only.**
+**A protocol is being developed to determine if and when appropriate to submit products from automated classification to OBIS.**
+Sponsored by NOAA PCMHAB20 project “Harmful Algal Bloom Community Technology Accelerator”
+
+Main steps in the workflow can be related to the [IFCB workflow diagram](https://raw.githubusercontent.com/hsosik/ifcb-analysis/master/Development/IFCB%20workflow%20chart.png) in the [ifcb-analysis wiki on GitHub](https://github.com/hsosik/ifcb-analysis/wiki)
+
+Step: Classification
+- Interpretation for the autoclass scores / transform automated classification into presence/absence
+Step: Summarization
+- Calculate concentration as number of ROIs classified to a taxon divided by volume analyzed
+Next step (not shown / would extend the diagram): Transforming to Darwin Core
+- Map resulting data table into Darwin Core table(s)
+
+### Target data product to standardize to Darwin Core:
+Concentration of 2 genera of HAB taxa from an IFCB sample(s) (e.g., [here is a sample with autoclass available in HABDAC at Del Mar Mooring](https://ifcb.caloos.org/timeline?dataset=del-mar-mooring&bin=D20210620T221255_IFCB158)
+
 ## R Markdown
 
 ```{r , echo=FALSE}
