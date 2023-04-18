@@ -24,6 +24,9 @@ Main steps in the workflow can be related to the [IFCB workflow diagram](https:/
 Step: Classification
 - Interpretation for the autoclass scores / transform automated classification into presence/absence
 
+Step: Matching class labels to scientific names
+- Match the class labels to scientific names in the World Register of Marine Species (WoRMS) taxonomic database.
+
 Step: Summarization
 - Calculate concentration as number of ROIs classified to a taxon divided by volume analyzed
 
@@ -48,17 +51,28 @@ The order of operations is important in this filtering and thresholding process.
 
 Our initial prototype will retain as ‘absence’ (zero count) when no ROIs exceed per-class threshold. However, we acknowledge that data providers may want to use a different per-class threshold to report absence, and might only want to report presence.
 
-Output from the Classification step is an intermediate table corresponding to Level 1b SeaBASS file (classification per ROI).
+Output from the Classification step is an intermediate table loosely corresponding to Level 1b SeaBASS file (classification per ROI).
 
 ```{r , echo=FALSE}
 
 
 ```
 
-## Summarization
-In this step, we use the table from the Classification step to calculate concentration as number of ROIs classified to a taxon divided by volume analyzed per sample.
+## Matching class labels to scientific names
+In this step, we use (a portion of) each autoclass label to query the API of the World Register of Marine Species (WoRMS) taxonomic database to return an accepted scientific name, its paired Aphia ID, and its taxon rank and kingdom.
 
-Output from the Summarization step is corresponding to Level 2 SeaBASS file.
+```{r , echo=FALSE}
+# example snippet
+# worms_record <- worrms::wm_records_taxamatch("Alexandrium catenella", fuzzy = TRUE)[[1]]
+# worms_record$lsid;  worms_record$rank; worms_record$kingdom
+
+
+```
+
+## Summarization
+In this step, we use the table from the Classification step and results from the Matching to WoRMS step to calculate concentration as number of ROIs classified to a taxon divided by volume analyzed per sample.
+
+Output from the Summarization step loosely corresponds to Level 2 SeaBASS file.
 
 ```{r , echo=FALSE}
 
@@ -66,7 +80,7 @@ Output from the Summarization step is corresponding to Level 2 SeaBASS file.
 ```
 
 ## Transforming to Darwin Core
-In this step, we transform the table from the Summarization step into two tables (an event table and an occurrence table), standardize autoclass labels to the WoRMS taxonomic database, and add columns to meet OBIS and GBIF requirements for the Darwin Core Archive package.
+In this step, we transform the table from the Summarization step into two tables (an event table and an occurrence table) and add columns to meet OBIS and GBIF requirements for the Darwin Core Archive package.
 
 We also add columns to meet the EU Horizon 2020 “Best practices and recommendations for plankton imagery data management” http://dx.doi.org/10.25607/OBP-1742
 
