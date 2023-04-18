@@ -87,20 +87,20 @@ read_autoclass_csv = function(bin, filter_vars = c()) {
 }
 
 
-#' Get metadata for a IFCB bin
+#' Get detailed info for a IFCB bin
 #' 
 #' @param bin A string, the bin id.
-#' @returns A list, elements for linked bin ids.
+#' @returns A list, the bin details.
 #' @examples
-#' get_bin_neighbors("D20230326T150748_IFCB158")
-get_bin_neighbors = function(bin) {
+#' get_bin_details("D20230326T150748_IFCB158")
+get_bin_details = function(bin) {
   url = "https://ifcb.caloos.org/api/bin/"
   bin_url = paste0(url, bin)
   request = httr::GET(url = bin_url)
   
   if (request$status_code == 200) {
     content = content(request, as = "parsed")
-    return(list("previous_bin" = content$previous_bin_id, "next_bin" = content$next_bin_id))
+    return(content)
   } else {
     message("Bin neighbors GET request failed with code: ", request$status_code)
     return(request$status_code)
