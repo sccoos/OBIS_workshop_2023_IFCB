@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+## R Markdown
 
 # Use Case: Interoperable IFCB data product for the CA HAB Bulletin
 # aka IFCB Dashboard to OBIS use case with automated classification
@@ -22,18 +23,32 @@ Main steps in the workflow can be related to the [IFCB workflow diagram](https:/
 
 Step: Classification
 - Interpretation for the autoclass scores / transform automated classification into presence/absence
+
 Step: Summarization
 - Calculate concentration as number of ROIs classified to a taxon divided by volume analyzed
+
 Next step (not shown / would extend the diagram): Transforming to Darwin Core
 - Map resulting data table into Darwin Core table(s)
 
 ### Target data product to standardize to Darwin Core:
 Concentration of 2 genera of HAB taxa from an IFCB sample(s) (e.g., [here is a sample with autoclass available in HABDAC at Del Mar Mooring](https://ifcb.caloos.org/timeline?dataset=del-mar-mooring&bin=D20210620T221255_IFCB158)
 
-## R Markdown
+## Classification
+In this step, we interpret the autoclass scores from the autoclass.csv file on the IFCB Dashboard. We will filter to the targeted class labels, apply a threshold per class label, and determine the “winning” class label per ROI, thus transforming the automated classification into a presence/absence table.
+
+The order of operations is important in this filtering and thresholding process. If the filtering is applied prior to thresholding, the concentration is possibly (likely) to be overestimated by excluding other classes that may have higher scores.
+
+Our initial prototype will retain as ‘absence’ (zero count) when no ROIs exceed per-class threshold. However, we acknowledge that data providers may want to use a different per-class threshold to report absence, and might only want to report presence.
 
 ```{r , echo=FALSE}
 
 
 ```
 
+## xx
+In this step, xx
+
+```{r , echo=FALSE}
+
+
+```
