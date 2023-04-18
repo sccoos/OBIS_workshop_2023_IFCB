@@ -48,13 +48,27 @@ The order of operations is important in this filtering and thresholding process.
 
 Our initial prototype will retain as ‘absence’ (zero count) when no ROIs exceed per-class threshold. However, we acknowledge that data providers may want to use a different per-class threshold to report absence, and might only want to report presence.
 
+Output from the Classification step is an intermediate table corresponding to Level 1b SeaBASS file (classification per ROI).
+
 ```{r , echo=FALSE}
 
 
 ```
 
-## xx
-In this step, xx
+## Summarization
+In this step, we use the table from the Classification step to calculate concentration as number of ROIs classified to a taxon divided by volume analyzed per sample.
+
+Output from the Summarization step is corresponding to Level 2 SeaBASS file.
+
+```{r , echo=FALSE}
+
+
+```
+
+## Transforming to Darwin Core
+In this step, we transform the table from the Summarization step into two tables (an event table and an occurrence table), standardize autoclass labels to the WoRMS taxonomic database, and add columns to meet OBIS and GBIF requirements for the Darwin Core Archive package.
+
+We also add columns to meet the EU Horizon 2020 “Best practices and recommendations for plankton imagery data management” http://dx.doi.org/10.25607/OBP-1742
 
 ```{r , echo=FALSE}
 
