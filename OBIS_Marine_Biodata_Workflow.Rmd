@@ -33,6 +33,14 @@ Next step (not shown / would extend the diagram): Transforming to Darwin Core
 ### Target data product to standardize to Darwin Core:
 Concentration of 2 genera of HAB taxa from an IFCB sample(s) (e.g., [here is a sample with autoclass available in HABDAC at Del Mar Mooring](https://ifcb.caloos.org/timeline?dataset=del-mar-mooring&bin=D20210620T221255_IFCB158)
 
+Preconditions:
+- IFCB Dashboard sample (bin) has autoclass csv file with scores from automated classifier
+- IFCB Dashboard sample has been populated with volume_analyzed, datetime, latitude, and longitude
+- Depth of sample has been provided through some means (not presently available in IFCB Dashboard)
+- For autoclass labels: A lookup table has been prepared with thresholds per class
+
+This workflow is being developed to meet the EU Horizon 2020 “Best practices and recommendations for plankton imagery data management” http://dx.doi.org/10.25607/OBP-1742
+
 ## Classification
 In this step, we interpret the autoclass scores from the autoclass.csv file on the IFCB Dashboard. We will filter to the targeted class labels, apply a threshold per class label, and determine the “winning” class label per ROI, thus transforming the automated classification into a presence/absence table.
 
