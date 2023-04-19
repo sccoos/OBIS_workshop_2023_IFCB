@@ -52,6 +52,15 @@ summarize_bin_occurrences = function(bin_details, occurrence_table, target_label
   bin_reclass_summary = bin_reclass_summary %>%
     complete(select(target_labels, intended_worms_taxon), fill = list(occurrences = 0))
   
+  get_labels_for_taxon = function(taxon) {
+    filtered = target_labels %>% filter(intended_worms_taxon == taxon)
+    return(str_c(filtered$label, collapse = " | "))
+  }
+  
+  # Add represented class labels
+  bin_reclass_summary = bin_reclass_summary %>% rowwise() %>% 
+    mutate(taxon_classes = get_labels_for_taxon(intended_worms_taxon))
+  
   # Calculate occurrence per mL
   bin_reclass_summary = bin_reclass_summary %>% 
     mutate(occurrences_per_ml = occurrences/bin_ml_analyzed)
@@ -64,8 +73,6 @@ summarize_bin_occurrences = function(bin_details, occurrence_table, target_label
       lng = bin_details$lng,
       bin_id = bin_details$bin_id
     )
-  
-  # TODO: Add column providing verbatim class labels used to inform occurences
   
   return(bin_reclass_summary)
 }
@@ -116,9 +123,9 @@ build_occurrence_table = function(occurrences_summary, bin_details) {
       basisOfRecord = "MachineObservation",
       identifiedBy = "",
       identificationVerificationStatus = "PredictedByMachine",
-      identificationReferences = "Machine learning model (here is where we will recommend DOI for trained model) | Software to run the machine learning model (cite version) | Software to interpret autoclass scores (cite this notebook version)", #TODO git branch: system("git rev-parse HEAD", intern=TRUE),
+      identificationReferences = "Machine learning model (DOI for trained model) | Software to run the machine learning model (version) | Software to interpret autoclass scores (cite this notebook version)", #TODO git branch: system("git rev-parse HEAD", intern=TRUE),
       associatedMedia = paste0("https://ifcb.caloos.org/timeline?", "dataset=", bin_details$primary_dataset, "&bin=", bin_id),
-      verbatimIdentification = "", #TODO gather class labels used for this occurrence
+      verbatimIdentification = taxon_classes,
       scientificName = scientificname,
       scientificNameID = lsid,
       taxonRank = rank,
