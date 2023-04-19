@@ -100,6 +100,8 @@ In this step, we transform the table from the Summarization step into two tables
 
 We also add columns to meet the EU Horizon 2020 “Best practices and recommendations for plankton imagery data management” http://dx.doi.org/10.25607/OBP-1742
 
+To assign the unique occurrenceID for the concentrations per taxon per sample we used eventID_taxonID, a pattern similar to the EU best practice, such that an individual included in the summed count would be represented by eventID_taxonID_roiID. Ultimately, we would like to test the DwC ResourceRelationship extension and/or DwC term associatedOrganisms to relate individuals to abundances reported to OBIS.
+
 ```{r}
 # intended column headers for event table
 # datasetName 	eventID 	eventDate 	decimalLongitude 	decimalLatitude 	countryCode 	geodeticDatum 	minimumDepthInMeters 	maximumDepthInMeters sampleSizeValue sampleSizeUnit
