@@ -43,10 +43,9 @@ Next step (not shown / would extend the diagram): Transforming to Darwin Core
 Concentration of 2 genera of HAB taxa from an IFCB sample(s) (e.g., [here is a sample with autoclass available in HABDAC at Del Mar Mooring](https://ifcb.caloos.org/timeline?dataset=del-mar-mooring&bin=D20210620T221255_IFCB158)
 
 Preconditions:
-- IFCB Dashboard sample (bin) has autoclass csv file with scores from automated classifier
+- IFCB Dashboard sample (bin) has autoclass csv file with scores per class label from automated classifier
 - IFCB Dashboard sample has been populated with a dataset name, volume_analyzed, datetime, latitude, longitude, and depth
-- Depth of sample has been provided through some means (not presently available in IFCB Dashboard)
-- For autoclass labels: A lookup table has been prepared with thresholds per class
+- For autoclass labels: A lookup table has been prepared with thresholds per class label
 
 This workflow is being developed to meet the EU Horizon 2020 “Best practices and recommendations for plankton imagery data management” http://dx.doi.org/10.25607/OBP-1742
 
@@ -100,6 +99,8 @@ kable(occurrences_summary)
 In this step, we transform the table from the Summarization step into two tables (an event table and an occurrence table) and add columns to meet OBIS and GBIF requirements for the Darwin Core Archive package.
 
 We also add columns to meet the EU Horizon 2020 “Best practices and recommendations for plankton imagery data management” http://dx.doi.org/10.25607/OBP-1742
+
+To assign the unique occurrenceID for the concentrations per taxon per sample we used eventID_taxonID, a pattern similar to the EU best practice, such that an individual included in the summed count would be represented by eventID_taxonID_roiID. Ultimately, we would like to test the DwC ResourceRelationship extension and/or DwC term associatedOrganisms to relate individuals to abundances reported to OBIS.
 
 ```{r}
 # intended column headers for event table
