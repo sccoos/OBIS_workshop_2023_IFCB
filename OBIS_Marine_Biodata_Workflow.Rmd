@@ -131,7 +131,52 @@ kable(occurrence_tbl)
 
 ## Extending to multiple events for time period
 
-```{r}
+```{r message = FALSE}
+start_date = "2021-09-25"
+end_date = "2021-09-27"
 
+target_labels = read_csv(here("data", "target_classification_labels.csv"))
+wm_records = get_worms_taxonomy(target_labels$intended_worms_taxon)
+
+bin_ids = get_bins_in_range(start_date, end_date)
+
+event_tables = list()
+occurrence_tables = list()
+
+for(bin in bin_ids) {
+  # check if it has autoclass
+  # if yes, build event + occurrence tables
+  if (bin_has_autoclass(bin)) {
+    # Build occurrence summary
+    bin_details = get_bin_details(bin)
+    bin_occurrences = get_bin_occurrences(bin, target_labels)
+    occurrences_summary = summarize_bin_occurrences(bin_details, bin_occurrences, target_labels)
+    
+    # Build dwc event table
+    event_tbl = build_event_table(bin_details)
+    
+    # Build dwc occurrence table
+    wm_occurrences = left_join(occurrences_summary, wm_records, by = c("intended_worms_taxon" = "intended_worms_taxon"))
+    occurrence_tbl = build_occurrence_table(wm_occurrences, bin_details)
+    
+    event_tables[bin] = list(event_tbl)
+    occurrence_tables[bin] = list(occurrence_tbl)
+  }
+}
+
+event_tbl = bind_rows(event_tables)
+occurrence_tbl = bind_rows(occurrence_tables)
 ```
 
+### Aggregated event table
+
+```{r}
+kable(event_tbl)
+```
+
+
+### Aggregated occurrence table
+
+```{r}
+kable(occurrence_tbl)
+```
