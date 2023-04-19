@@ -68,19 +68,20 @@ Our initial prototype will retain as ‘absence’ (zero count) when no ROIs exc
 
 Once the output from this Classification step is matched to scientific names and IDs (next step) the intermediate table loosely corresponds to Level 1b SeaBASS file (classification per ROI).
 
-<<<<<<< HEAD
-```{r , echo=FALSE, message = FALSE}
+
+```{r message = FALSE}
 sample_bin = "D20210926T181303_IFCB158"
+bin_details = get_bin_details(sample_bin)
 # Thresholds used in this prototype are for testing purposes only.
 
-occurrence_summary = get_bin_occurrence_summary(sample_bin, target_labels)
-kable(occurrence_summary)
+bin_occurrences = get_bin_occurrences(sample_bin, target_labels)
+kable(bin_occurrences)
 ```
 
 ## Matching class labels to scientific names and IDs
 In this step, we use (a portion of) each autoclass label to query the API of the World Register of Marine Species (WoRMS) taxonomic database to return an accepted scientific name, its paired Aphia ID, and its taxon rank and kingdom.
 
-```{r , echo=FALSE}
+```{r message = FALSE}
 wm_records = get_worms_taxonomy(target_labels$intended_worms_taxon)
 kable(wm_records)
 ```
@@ -90,9 +91,9 @@ In this step, we use the table from the Classification step and results from the
 
 Output from the Summarization step loosely corresponds to Level 2 SeaBASS file.
 
-```{r , echo=FALSE}
-joined_table = left_join(occurrence_summary, wm_records, by = c("intended_worms_taxon" = "intended_worms_taxon"))
-kable(joined_table)
+```{r}
+occurrences_summary = summarize_bin_occurrences(bin_details, bin_occurrences, target_labels)
+kable(occurrences_summary)
 ```
 
 ## Transforming to Darwin Core
@@ -100,10 +101,15 @@ In this step, we transform the table from the Summarization step into two tables
 
 We also add columns to meet the EU Horizon 2020 “Best practices and recommendations for plankton imagery data management” http://dx.doi.org/10.25607/OBP-1742
 
-```{r , echo=FALSE}
+```{r}
 # intended column headers for event table
 # datasetName 	eventID 	eventDate 	decimalLongitude 	decimalLatitude 	countryCode 	geodeticDatum 	minimumDepthInMeters 	maximumDepthInMeters
+event_tbl = build_event_table(bin_details)
+kable(event_tbl)
+```
 
+
+```{r}
 # intended column headers for occurrence table
 # eventID 	occurrenceID 	basisOfRecord 	identifiedBy identificationVerificationStatus 	identificationReferences 	associatedMedia 	verbatimIdentification 	scientificName 	scientificNameID 	taxonRank kingdom 	occurrenceStatus 	organismQuantity organismQuantityType institutionCode
 # fill values per column
@@ -113,4 +119,16 @@ We also add columns to meet the EU Horizon 2020 “Best practices and recommenda
 # identificationReferences Machine learning model (here is where we will recommend DOI for trained model); Software to run the machine learning model (cite version); Software to interpret autoclass scores (cite this notebook version)
 # organismQuantityType counts per milliliter (is there a controlled vocabulary term for the counting unit is colony, chain, or single cell?)
 
+# Join occurrence summary with taxon records
+wm_occurrences = left_join(occurrences_summary, wm_records, by = c("intended_worms_taxon" = "intended_worms_taxon"))
+occurrence_tbl = build_occurrence_table(wm_occurrences, bin_details)
+
+kable(occurrence_tbl)
 ```
+
+## Extending to multiple events for time period
+
+```{r}
+
+```
+

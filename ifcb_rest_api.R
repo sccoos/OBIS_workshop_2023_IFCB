@@ -103,7 +103,7 @@ get_bin_details = function(bin) {
   
   if (request$status_code == 200) {
     content = content(request, as = "parsed")
-    return(content)
+    return(c(bin_id = bin, content))
   } else {
     message("Bin neighbors GET request failed with code: ", request$status_code)
     return(request$status_code)
