@@ -57,9 +57,19 @@ summarize_bin_occurrences = function(bin_details, occurrence_table, target_label
     return(str_c(filtered$label, collapse = " | "))
   }
   
+  get_row_pids_for_taxon = function(bin_id, taxons) {
+    filtered = occurrence_table %>% filter(str_detect(taxons, class)) %>%
+      mutate(row_id = str_replace(pid, bin_id, ""))
+  
+    return(str_c(filtered$row_id, collapse = " | "))
+  }
+  
   # Add represented class labels
   bin_reclass_summary = bin_reclass_summary %>% rowwise() %>% 
-    mutate(taxon_classes = get_labels_for_taxon(intended_worms_taxon))
+    mutate(
+      taxon_classes = get_labels_for_taxon(intended_worms_taxon),
+      associated_rois = get_row_pids_for_taxon(bin_details$bin_id, taxon_classes)
+    )
   
   # Calculate occurrence per mL
   bin_reclass_summary = bin_reclass_summary %>% 
@@ -109,7 +119,9 @@ build_event_table = function(bin_details) {
     countryCode = 'US',
     geodeticDatum = 'WGS84',
     minimumDepthInMeters = bin_details$depth,
-    maximumDepthInMeters = bin_details$depth
+    maximumDepthInMeters = bin_details$depth,
+    sampleSizeValue = bin_details$ml_analyzed,
+    sampleSizeUnit = "milliliter"
   )
   
   return(as.tibble(event))
@@ -118,13 +130,13 @@ build_event_table = function(bin_details) {
 build_occurrence_table = function(occurrences_summary, bin_details) {
   occurrences = occurrences_summary %>% 
     transmute(
-      eventID = bin_id,
-      occurrenceID = paste0(bin_id, "_", AphiaID),
+      eventID = bin_details$bin_id,
+      occurrenceID = paste0(bin_details$bin_id, "_", AphiaID),
       basisOfRecord = "MachineObservation",
       identifiedBy = "",
       identificationVerificationStatus = "PredictedByMachine",
       identificationReferences = "Machine learning model (DOI for trained model) | Software to run the machine learning model (version) | Software to interpret autoclass scores (cite this notebook version)", #TODO git branch: system("git rev-parse HEAD", intern=TRUE),
-      associatedMedia = paste0("https://ifcb.caloos.org/timeline?", "dataset=", bin_details$primary_dataset, "&bin=", bin_id),
+      associatedMedia = str_replace_all(associated_rois, "_", paste0("https://ifcb.caloos.org/image?", "dataset=", bin_details$primary_dataset, "&bin=", bin_details$bin_id, "&image=")), #https://ifcb.caloos.org/image?image=00108&dataset=del-mar-mooring&bin=D20210926T181303_IFCB158
       verbatimIdentification = taxon_classes,
       scientificName = scientificname,
       scientificNameID = lsid,
