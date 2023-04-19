@@ -4,11 +4,6 @@ library(httr)
 library(jsonlite)
 library(here)
 
-# test vars
-ifcb_dataset = "del-mar-mooring"
-ifcb_bin = "D20210926T181303_IFCB158"
-autoclass_vars = c("pid", "Alexandrium catenella", "Pseudo-nitzschia", "pennate Pseudo-nitzschia")
-
 
 #' Get metadata for a IFCB bin
 #' 
@@ -106,6 +101,27 @@ get_bin_details = function(bin) {
     return(c(bin_id = bin, content))
   } else {
     message("Bin neighbors GET request failed with code: ", request$status_code)
+    return(request$status_code)
+  }
+}
+
+
+#' Get all bins in time range
+#' 
+#' @param start_date A string, a yyyy-mm-dd date.
+#' @param end_date A string, a yyyy-mm-dd date.
+#' @returns A list, the bin ids within range.
+#' @examples
+#' get_bins_in_range("2021-09-25", "2021-09-27")
+get_bins_in_range = function(start_date, end_date) { #https://ifcb.caloos.org/del-mar-mooring/api/feed/temperature/start/2022-04-19/end/2023-04-19
+  url = paste0("https://ifcb.caloos.org/del-mar-mooring/api/feed/temperature/start/",start_date,"/end/",end_date)
+  request = httr::GET(url = url)
+  
+  if (request$status_code == 200) {
+    content = content(request, as = "parsed")
+    return(list(content(request, as = "parsed")) %>% purrr::flatten() %>% map(1) %>% as_vector() %>% str_replace_all("http://ifcb.caloos.org/del-mar-mooring/",""))
+  } else {
+    message("Autoclass GET request failed with code:", request$status_code)
     return(request$status_code)
   }
 }

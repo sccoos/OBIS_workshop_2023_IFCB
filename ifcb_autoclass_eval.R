@@ -33,6 +33,14 @@ get_bin_occurrences = function(bin_id, target_labels = c()) {
   return(bin_autoclass_filtered)
 }
 
+#' Build summary table of occurrences
+#' 
+#' @param bin_details A list, the list of bin details.
+#' @param occurrence_table A dataframe, the table of occurrences.
+#' @param target_labels A datadframe, of the provided taxon & thresholds.
+#' @returns A dataframe, a summary of occurrences.
+#' @examples
+#' get_bin_occurrence_summary(bin_details, occurrence_table, target_labels)
 summarize_bin_occurrences = function(bin_details, occurrence_table, target_labels) {
   
   # Lookup map for class -> threshold
@@ -57,8 +65,8 @@ summarize_bin_occurrences = function(bin_details, occurrence_table, target_label
     return(str_c(filtered$label, collapse = " | "))
   }
   
-  get_row_pids_for_taxon = function(bin_id, taxons) {
-    filtered = occurrence_table %>% filter(str_detect(taxons, class)) %>%
+  get_row_pids_for_taxon = function(bin_id, taxa) {
+    filtered = occurrence_table %>% filter(str_detect(taxa, class)) %>%
       mutate(row_id = str_replace(pid, bin_id, ""))
   
     return(str_c(filtered$row_id, collapse = " | "))
@@ -87,11 +95,16 @@ summarize_bin_occurrences = function(bin_details, occurrence_table, target_label
   return(bin_reclass_summary)
 }
 
-# Get worms
-get_worms_taxonomy = function(taxons) {
+#' Perform worms lookup on taxa
+#' 
+#' @param taxa A list, the list of taxa.
+#' @returns A dataframe, a table of worms records for the provided taxa.
+#' @examples
+#' get_worms_taxonomy(target_labels$intended_worms_taxon)
+get_worms_taxonomy = function(taxa) {
   wm_records = list()
-  for(i in 1:length(taxons)) {
-    taxon = taxons[[i]]
+  for(i in 1:length(taxa)) {
+    taxon = taxa[[i]]
     
     if(!exists(taxon, where = wm_records)) {
       #TODO: wrap in try catch for failed lookups/no match
@@ -109,6 +122,12 @@ get_worms_taxonomy = function(taxons) {
   return(wm_df)
 }
 
+#' Build Darwin core Event table
+#' 
+#' @param bin_details A list, the bin details.
+#' @returns A dataframe, a table of darwin core events.
+#' @examples
+#' build_event_table(bin_details)
 build_event_table = function(bin_details) {
   event = list(
     datasetName = bin_details$primary_dataset,
@@ -127,6 +146,13 @@ build_event_table = function(bin_details) {
   return(as.tibble(event))
 }
 
+#' Build Darwin core Occurrence table
+#' 
+#' @param occurrences_summary A dataframe, the occurrences summary table.
+#' @param bin_details A list, the bin details.
+#' @returns A dataframe, a table of darwin core occurrences
+#' @examples
+#' build_occurrence_table(bin_details)
 build_occurrence_table = function(occurrences_summary, bin_details) {
   occurrences = occurrences_summary %>% 
     transmute(
