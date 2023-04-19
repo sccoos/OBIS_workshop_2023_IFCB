@@ -120,7 +120,7 @@ build_event_table = function(bin_details) {
     geodeticDatum = 'WGS84',
     minimumDepthInMeters = bin_details$depth,
     maximumDepthInMeters = bin_details$depth,
-    sampleSizeValue = bin_details$ml_analyzed,
+    sampleSizeValue = as.double(str_extract(bin_details$ml_analyzed, "\\d+\\.+\\d+")),
     sampleSizeUnit = "milliliter"
   )
   
