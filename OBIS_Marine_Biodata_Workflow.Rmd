@@ -7,6 +7,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(knitr)
+source("ifcb_autoclass_eval.R")
 ```
 ## R Markdown
 Notebook developed with R version 4.2.2
@@ -50,26 +53,32 @@ This workflow is being developed to meet the EU Horizon 2020 “Best practices a
 ## Classification
 In this step, we interpret the autoclass scores from the autoclass.csv file on the IFCB Dashboard. We will filter to the targeted class labels, apply a threshold per class label, and determine the “winning” class label per ROI, thus transforming the automated classification into a presence/absence table.
 
+```{r message = FALSE}
+target_labels = read_csv(here("data", "target_classification_labels.csv"))
+
+kable(target_labels)
+```
+
+
 The order of operations is important in this filtering and thresholding process. If the filtering is applied prior to thresholding, the concentration is possibly (likely) to be overestimated by excluding other classes that may have higher scores.
 
 Our initial prototype will retain as ‘absence’ (zero count) when no ROIs exceed per-class threshold. However, we acknowledge that data providers may want to use a different per-class threshold to report absence, and might only want to report presence.
 
 Output from the Classification step is an intermediate table loosely corresponding to Level 1b SeaBASS file (classification per ROI).
 
-```{r , echo=FALSE}
+```{r , echo=FALSE, message = FALSE}
+sample_bin = "D20210926T181303_IFCB158"
 
-
+occurrence_summary = get_bin_occurrence_summary(sample_bin, target_labels)
+kable(occurrence_summary)
 ```
 
 ## Matching class labels to scientific names
 In this step, we use (a portion of) each autoclass label to query the API of the World Register of Marine Species (WoRMS) taxonomic database to return an accepted scientific name, its paired Aphia ID, and its taxon rank and kingdom.
 
 ```{r , echo=FALSE}
-# example snippet
-# worms_record <- worrms::wm_records_taxamatch("Alexandrium catenella", fuzzy = TRUE)[[1]]
-# worms_record$lsid;  worms_record$rank; worms_record$kingdom
-
-
+wm_records = get_worms_taxonomy(target_labels$intended_worms_taxon)
+kable(wm_records)
 ```
 
 ## Summarization
@@ -78,8 +87,8 @@ In this step, we use the table from the Classification step and results from the
 Output from the Summarization step loosely corresponds to Level 2 SeaBASS file.
 
 ```{r , echo=FALSE}
-
-
+joined_table = left_join(occurrence_summary, wm_records, by = c("intended_worms_taxon" = "intended_worms_taxon"))
+kable(joined_table)
 ```
 
 ## Transforming to Darwin Core

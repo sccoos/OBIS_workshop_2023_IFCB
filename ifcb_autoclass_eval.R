@@ -1,22 +1,16 @@
 # R script to interpret IFCB autoclass data
 # TODO: more information about script
 source("ifcb_rest_api.R")
+library(worrms)
 
-
-# Get target class labels and associated thresholds for inferring species presence
-
-target_labels = read_csv(here("data", "target_classification_labels.csv"))
-
-# For a given bin:
-bin_id = "D20210926T181303_IFCB158"
-
-
-## documentation
+#' Get occurrences from bin based on taxon/thresholds
+#' 
+#' @param bin_id A string, the bin id.
+#' @param target_labels A datadframe, of the provided taxon & thresholds.
+#' @returns A dataframe, a summary of occurrences.
+#' @examples
+#' get_bin_occurrence_summary("D20230326T150748_IFCB158", target_labels)
 get_bin_occurrence_summary = function(bin_id, target_labels = c()) {
-  ## 1. Check if bin has autoclass
-  ## 2. Get bin metadata/details
-  ## 3. Download/read autoclass data
-  ## 4. Apply thresholds
   
   # If autoclass file exists for bin
   if (!bin_has_autoclass(bin_id)) {
@@ -45,17 +39,21 @@ get_bin_occurrence_summary = function(bin_id, target_labels = c()) {
     group_by(pid) %>%
     top_n(1, score)
   
+  # Aggregate occurrence counts for each target taxon
   bin_reclass_summary = bin_autoclass_filtered %>%
-    mutate(taxon = taxon_lookup[class]) %>%
-    group_by(taxon) %>%
-    summarize(occurrences = n()) %>% 
+    mutate(intended_worms_taxon = taxon_lookup[class]) %>%
+    group_by(intended_worms_taxon) %>%
+    summarize(occurrences = n())
+  
+  # Fill in absence
+  bin_reclass_summary = bin_reclass_summary %>%
+    complete(select(target_labels, intended_worms_taxon), fill = list(occurrences = 0))
+  
+  # Calculate occurrence per mL
+  bin_reclass_summary = bin_reclass_summary %>% 
     mutate(occurrences_per_ml = occurrences/bin_ml_analyzed)
   
-  
-  ## TODO
-  # worms lookup: scientificName 	scientificNameID 	taxonRank kingdom
-  # add event metadata
-  
+  # Add details to output table
   bin_reclass_summary = bin_reclass_summary %>%
     mutate(
       sampleTime = bin_details$timestamp_iso,
@@ -66,4 +64,21 @@ get_bin_occurrence_summary = function(bin_id, target_labels = c()) {
   
   
   return(bin_reclass_summary)
+}
+
+# Get worms
+get_worms_taxonomy = function(taxons) {
+  wm_records = list()
+  for(i in 1:length(taxons)) {
+    taxon = taxons[[i]]
+    
+    if(!exists(taxon, where = wm_records)) {
+      record = worrms::wm_records_taxamatch(taxon, fuzzy = TRUE)[[1]]
+      record = record %>% select(scientificname, lsid, rank, kingdom) %>% mutate(intended_worms_taxon = taxon)
+      wm_records[taxon] = list(record)
+    }
+  }
+  
+  wm_df = bind_rows(wm_records)
+  return(wm_df)
 }
