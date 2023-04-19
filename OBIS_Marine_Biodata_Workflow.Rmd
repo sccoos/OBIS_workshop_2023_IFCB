@@ -44,7 +44,7 @@ Concentration of 2 genera of HAB taxa from an IFCB sample(s) (e.g., [here is a s
 
 Preconditions:
 - IFCB Dashboard sample (bin) has autoclass csv file with scores from automated classifier
-- IFCB Dashboard sample has been populated with volume_analyzed, datetime, latitude, and longitude
+- IFCB Dashboard sample has been populated with a dataset name, volume_analyzed, datetime, latitude, longitude, and depth
 - Depth of sample has been provided through some means (not presently available in IFCB Dashboard)
 - For autoclass labels: A lookup table has been prepared with thresholds per class
 
@@ -103,7 +103,9 @@ We also add columns to meet the EU Horizon 2020 “Best practices and recommenda
 
 ```{r}
 # intended column headers for event table
-# datasetName 	eventID 	eventDate 	decimalLongitude 	decimalLatitude 	countryCode 	geodeticDatum 	minimumDepthInMeters 	maximumDepthInMeters
+# datasetName 	eventID 	eventDate 	decimalLongitude 	decimalLatitude 	countryCode 	geodeticDatum 	minimumDepthInMeters 	maximumDepthInMeters sampleSizeValue sampleSizeUnit
+#sampleSizeValue is ml_analyzed
+# sampleSizeUnit is milliliter
 event_tbl = build_event_table(bin_details)
 kable(event_tbl)
 ```
