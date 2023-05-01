@@ -2,21 +2,37 @@
 title: "OBIS Marine Biodata Workshop"
 author: "Stace Beaulieu, Ian Brunjes"
 date: "2023-04-18"
-output: html_document
+output:
+  html_document:
+    theme: united
+    toc: true
+    toc_depth: 2
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 library(knitr)
+library(kableExtra)
+library(plotly)
+
 source("ifcb_autoclass_eval.R")
+source("dwc_transform.R")
 ```
-## R Markdown
+
+# Overview
+
 Notebook developed with R version 4.2.2
 
-# Use Case: Interoperable IFCB data product for the CA HAB Bulletin
-# aka IFCB Dashboard to OBIS use case with automated classification
-## Event core with Occurrence extension
+## Use Case
+
+- Interoperable IFCB data product for the CA HAB Bulletin
+- IFCB Dashboard to OBIS use case with automated classification
+- Event core with Occurrence extension
+
+## Authors
+
 Ian Brunjes (SCCOOS), Stace Beaulieu (WHOI)
 Prepared for OBIS IOOS Marine Biological Data Mobilization Workshop April 2023
 
@@ -24,6 +40,8 @@ Prepared for OBIS IOOS Marine Biological Data Mobilization Workshop April 2023
 **A protocol is being developed to determine if and when appropriate to submit products from automated classification to OBIS.**
 
 Sponsored by NOAA PCMHAB20 project “Harmful Algal Bloom Community Technology Accelerator”
+
+# Workflow
 
 Main steps in the workflow can be related to the [IFCB workflow diagram](https://raw.githubusercontent.com/hsosik/ifcb-analysis/master/Development/IFCB%20workflow%20chart.png) in the [ifcb-analysis wiki on GitHub](https://github.com/hsosik/ifcb-analysis/wiki)
 
@@ -39,7 +57,7 @@ Step: Summarization
 Next step (not shown / would extend the diagram): Transforming to Darwin Core
 - Map resulting data table into Darwin Core table(s)
 
-### Target data product to standardize to Darwin Core:
+## Target data product to standardize to Darwin Core:
 Concentration of 2 genera of HAB taxa from an IFCB sample(s) (e.g., [here is a sample with autoclass available in HABDAC at Del Mar Mooring](https://ifcb.caloos.org/timeline?dataset=del-mar-mooring&bin=D20210620T221255_IFCB158)
 
 Preconditions:
@@ -55,7 +73,7 @@ In this step, we interpret the autoclass scores from the autoclass.csv file on t
 ```{r message = FALSE}
 target_labels = read_csv(here("data", "target_classification_labels.csv"))
 
-kable(target_labels)
+kable(target_labels) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%")
 ```
 
 
@@ -74,7 +92,7 @@ bin_details = get_bin_details(sample_bin)
 # Thresholds used in this prototype are for testing purposes only.
 
 bin_occurrences = get_bin_occurrences(sample_bin, target_labels)
-kable(bin_occurrences)
+kable(bin_occurrences) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%")
 ```
 
 ## Matching class labels to scientific names and IDs
@@ -82,7 +100,7 @@ In this step, we use (a portion of) each autoclass label to query the API of the
 
 ```{r message = FALSE}
 wm_records = get_worms_taxonomy(target_labels$intended_worms_taxon)
-kable(wm_records)
+kable(wm_records) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%")
 ```
 
 ## Summarization
@@ -92,7 +110,7 @@ Output from the Summarization step loosely corresponds to Level 2 SeaBASS file.
 
 ```{r}
 occurrences_summary = summarize_bin_occurrences(bin_details, bin_occurrences, target_labels)
-kable(occurrences_summary)
+kable(occurrences_summary) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%")
 ```
 
 ## Transforming to Darwin Core
@@ -103,49 +121,41 @@ We also add columns to meet the EU Horizon 2020 “Best practices and recommenda
 To assign the unique occurrenceID for the concentrations per taxon per sample we used eventID_taxonID, a pattern similar to the EU best practice, such that an individual included in the summed count would be represented by eventID_taxonID_roiID. Ultimately, we would like to test the DwC ResourceRelationship extension and/or DwC term associatedOrganisms to relate individuals to abundances reported to OBIS.
 
 ```{r}
-# intended column headers for event table
-# datasetName 	eventID 	eventDate 	decimalLongitude 	decimalLatitude 	countryCode 	geodeticDatum 	minimumDepthInMeters 	maximumDepthInMeters sampleSizeValue sampleSizeUnit
-#sampleSizeValue is ml_analyzed
-# sampleSizeUnit is milliliter
+# Build the Darwin Core Event table
 event_tbl = build_event_table(bin_details)
-kable(event_tbl)
+kable(event_tbl) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%")
 ```
 
 
 ```{r}
-# intended column headers for occurrence table
-# eventID 	occurrenceID 	basisOfRecord 	identifiedBy identificationVerificationStatus 	identificationReferences 	associatedMedia 	verbatimIdentification 	scientificName 	scientificNameID 	taxonRank kingdom 	occurrenceStatus 	organismQuantity organismQuantityType institutionCode
-# fill values per column
-# basisOfRecord MachineObservation
-# identifiedBy do not fill (leave blank for non-validated imaging dataset)
-# identificationVerificationStatus PredictedByMachine
-# identificationReferences Machine learning model (here is where we will recommend DOI for trained model); Software to run the machine learning model (cite version); Software to interpret autoclass scores (cite this notebook version)
-# organismQuantityType counts per milliliter (is there a controlled vocabulary term for the counting unit is colony, chain, or single cell?)
-
 # Join occurrence summary with taxon records
 wm_occurrences = left_join(occurrences_summary, wm_records, by = c("intended_worms_taxon" = "intended_worms_taxon"))
-occurrence_tbl = build_occurrence_table(wm_occurrences, bin_details)
 
-kable(occurrence_tbl)
+# Build the Darwin Core Occurrence table
+occurrence_tbl = build_occurrence_table(wm_occurrences, bin_details)
+kable(occurrence_tbl) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%")
 ```
 
 ## Extending to multiple events for time period
 
 ```{r message = FALSE}
+# Demonstrating how to build the DwC tables for all bins within a span of time
 start_date = "2021-09-25"
 end_date = "2021-09-27"
 
+# Read in classification input parameters
 target_labels = read_csv(here("data", "target_classification_labels.csv"))
+
+# Query WORMS lookup table
 wm_records = get_worms_taxonomy(target_labels$intended_worms_taxon)
 
+# Get the ifcb bins within time span and construct
 bin_ids = get_bins_in_range(start_date, end_date)
 
 event_tables = list()
 occurrence_tables = list()
 
 for(bin in bin_ids) {
-  # check if it has autoclass
-  # if yes, build event + occurrence tables
   if (bin_has_autoclass(bin)) {
     # Build occurrence summary
     bin_details = get_bin_details(bin)
@@ -164,19 +174,44 @@ for(bin in bin_ids) {
   }
 }
 
+# Bind each per bin result into single event/occurrence table
 event_tbl = bind_rows(event_tables)
 occurrence_tbl = bind_rows(occurrence_tables)
+
+# Save to output to .csv
+write_csv(event_tbl, here("output", "event.csv"))
+write_csv(occurrence_tbl, here("output", "occurrence.csv"))
 ```
+
+
 
 ### Aggregated event table
 
 ```{r}
-kable(event_tbl)
+kable(event_tbl) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%", height = "400px")
 ```
+
+
 
 
 ### Aggregated occurrence table
 
 ```{r}
-kable(occurrence_tbl)
+kable(occurrence_tbl) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%", height = "400px")
 ```
+
+
+
+### Visualizing results
+```{r out.width="100%"} 
+
+# Join event timestamp to occurrences
+eo = left_join(occurrence_tbl, select(event_tbl, eventID, eventDate), by = join_by(eventID)) %>% mutate(eventDate = as_datetime(eventDate))
+
+
+# Built plotly
+p = eo %>% ggplot(aes(x=eventDate, y=organismQuantity, color = scientificName)) + geom_point() + geom_line() + labs(x = "", y = "organismQuantity (counts per milliliter)", title = paste0("Del Mar IFCB Occurrence Data (", start_date, " - ", end_date, ")"))
+
+ggplotly(p) %>% layout(legend = list(title = "", x = 0.75, y = 0.9))
+```
+
