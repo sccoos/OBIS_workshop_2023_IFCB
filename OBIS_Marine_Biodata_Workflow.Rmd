@@ -4,7 +4,8 @@ author: "Stace Beaulieu, Ian Brunjes"
 date: "2023-04-18"
 output: 
   html_document:
-    keep_md: true
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -133,7 +134,7 @@ occurrence_tbl = build_occurrence_table(wm_occurrences, bin_details)
 kable(occurrence_tbl) %>% kable_material(c("striped", "hover")) %>% scroll_box(width = "100%")
 ```
 
-## Extending to multiple events for time period
+## Extending workflow over a timespan
 
 ```{r message = FALSE}
 # Demonstrating how to build the DwC tables for all bins within a span of time

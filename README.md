@@ -1,5 +1,10 @@
 # OBIS_workshop_2023_IFCB
+
 Repository to support collaboration during the OBIS IOOS Marine Biological Data Mobilization Workshop 2023 (https://ioos.github.io/bio_mobilization_workshop/)
+
+## Viewing the workflow in R Markdown
+
+https://sccoos.github.io/OBIS_workshop_2023_IFCB/OBIS_Marine_Biodata_Workflow.html
 
 Authors: Stace Beaulieu (WHOI), Ian Brunjes (SCCOOS)
 
