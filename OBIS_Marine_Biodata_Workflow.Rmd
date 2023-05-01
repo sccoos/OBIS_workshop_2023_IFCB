@@ -2,12 +2,9 @@
 title: "OBIS Marine Biodata Workshop"
 author: "Stace Beaulieu, Ian Brunjes"
 date: "2023-04-18"
-output:
+output: 
   html_document:
-    theme: united
-    toc: true
-    toc_depth: 2
-    toc_float: true
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
@@ -206,7 +203,9 @@ kable(occurrence_tbl) %>% kable_material(c("striped", "hover")) %>% scroll_box(w
 ```{r out.width="100%"} 
 
 # Join event timestamp to occurrences
-eo = left_join(occurrence_tbl, select(event_tbl, eventID, eventDate), by = join_by(eventID)) %>% mutate(eventDate = as_datetime(eventDate))
+eo = left_join(occurrence_tbl, event_tbl, by = join_by(eventID)) %>%
+  mutate(eventDate = as_datetime(eventDate)) %>%
+  select(eventID, eventDate, scientificName, organismQuantity)
 
 
 # Built plotly
